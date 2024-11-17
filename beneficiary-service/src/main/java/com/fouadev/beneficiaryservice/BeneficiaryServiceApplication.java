@@ -18,10 +18,10 @@ public class BeneficiaryServiceApplication {
 		SpringApplication.run(BeneficiaryServiceApplication.class, args);
 	}
 
-	//@Bean
+	@Bean
 	CommandLineRunner init(BeneficiaryRepository beneficiaryRepository){
 		return args -> {
-			Stream.of("fouad","reda","mohamed").forEach( name -> {
+			Stream.of("fouad","reda","mohamed","imane","ahmed").forEach( name -> {
 				Beneficiary beneficiary = Beneficiary.builder()
 						.id(UUID.randomUUID().toString())
 						.firstName(name)
