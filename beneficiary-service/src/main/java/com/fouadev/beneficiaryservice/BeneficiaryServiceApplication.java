@@ -1,7 +1,15 @@
 package com.fouadev.beneficiaryservice;
 
+import com.fouadev.beneficiaryservice.entities.Beneficiary;
+import com.fouadev.beneficiaryservice.entities.BeneficiaryType;
+import com.fouadev.beneficiaryservice.repositories.BeneficiaryRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @SpringBootApplication
 public class BeneficiaryServiceApplication {
@@ -10,4 +18,32 @@ public class BeneficiaryServiceApplication {
 		SpringApplication.run(BeneficiaryServiceApplication.class, args);
 	}
 
+	//@Bean
+	CommandLineRunner init(BeneficiaryRepository beneficiaryRepository){
+		return args -> {
+			Stream.of("fouad","reda","mohamed").forEach( name -> {
+				Beneficiary beneficiary = Beneficiary.builder()
+						.id(UUID.randomUUID().toString())
+						.firstName(name)
+						.lastName(name+" last")
+						.rib(generateRib())
+						.beneficiaryType(BeneficiaryType.PHYSIQUE)
+						.build();
+				beneficiaryRepository.save(beneficiary);
+
+				System.out.println("**************************");
+				System.out.println("added "+beneficiary);
+			});
+		};
+	}
+
+	private static String generateRib() {
+		// Generate a 24-digit RIB as a string
+		StringBuilder rib = new StringBuilder();
+		for (int i = 0; i < 24; i++) {
+			int digit = (int) (Math.random() * 10); // Random digit between 0-9
+			rib.append(digit);
+		}
+		return rib.toString();
+	}
 }
