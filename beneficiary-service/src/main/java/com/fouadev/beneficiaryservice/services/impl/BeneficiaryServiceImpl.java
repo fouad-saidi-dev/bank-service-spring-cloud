@@ -2,14 +2,20 @@ package com.fouadev.beneficiaryservice.services.impl;
 
 import com.fouadev.beneficiaryservice.dto.BeneficiaryDTO;
 import com.fouadev.beneficiaryservice.entities.Beneficiary;
+import com.fouadev.beneficiaryservice.feign.TransferRestClient;
 import com.fouadev.beneficiaryservice.mapper.BeneficiaryMapper;
+import com.fouadev.beneficiaryservice.model.Transfer;
 import com.fouadev.beneficiaryservice.repositories.BeneficiaryRepository;
 import com.fouadev.beneficiaryservice.services.BeneficiaryService;
+import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +27,8 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     private BeneficiaryRepository beneficiaryRepository;
     @Autowired
     private BeneficiaryMapper beneficiaryMapper;
+    @Autowired
+    private TransferRestClient transferRestClient;
 
     @Override
     public BeneficiaryDTO createBeneficiary(BeneficiaryDTO beneficiaryDTO) {
@@ -64,12 +72,14 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
 
     @Override
     public List<BeneficiaryDTO> getAllBeneficiaries() {
+         Collection<Transfer> transfers = transferRestClient.getAllTransfers().getContent();
 
         List<BeneficiaryDTO> beneficiaryDTOS = new ArrayList<>();
 
         List<Beneficiary> beneficiaryList = beneficiaryRepository.findAll();
 
         for (Beneficiary beneficiary : beneficiaryList) {
+            beneficiary.setTransferList(transfers);
             BeneficiaryDTO beneficiaryDTO = beneficiaryMapper.fromBeneficiary(beneficiary);
             beneficiaryDTOS.add(beneficiaryDTO);
         }

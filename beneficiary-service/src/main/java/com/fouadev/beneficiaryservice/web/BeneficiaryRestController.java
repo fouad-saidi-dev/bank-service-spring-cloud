@@ -33,4 +33,5 @@ public class BeneficiaryRestController {
     public void deleteBeneficiary(@PathVariable String id) {
         beneficiaryService.deleteBeneficiary(id);
     }
+
 }

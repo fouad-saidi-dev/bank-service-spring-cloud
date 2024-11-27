@@ -2,16 +2,21 @@ package com.fouadev.beneficiaryservice;
 
 import com.fouadev.beneficiaryservice.entities.Beneficiary;
 import com.fouadev.beneficiaryservice.entities.BeneficiaryType;
+import com.fouadev.beneficiaryservice.feign.TransferRestClient;
+import com.fouadev.beneficiaryservice.model.Transfer;
 import com.fouadev.beneficiaryservice.repositories.BeneficiaryRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 @SpringBootApplication
+@EnableFeignClients
 public class BeneficiaryServiceApplication {
 
 	public static void main(String[] args) {
@@ -19,8 +24,10 @@ public class BeneficiaryServiceApplication {
 	}
 
 	@Bean
-	CommandLineRunner init(BeneficiaryRepository beneficiaryRepository){
+	CommandLineRunner init(BeneficiaryRepository beneficiaryRepository,
+						   TransferRestClient transferRestClient){
 		return args -> {
+			Collection<Transfer> transfers = transferRestClient.getAllTransfers().getContent();
 			Stream.of("fouad","reda","mohamed","imane","ahmed").forEach( name -> {
 				Beneficiary beneficiary = Beneficiary.builder()
 						.id(UUID.randomUUID().toString())
@@ -28,12 +35,15 @@ public class BeneficiaryServiceApplication {
 						.lastName(name+" last")
 						.rib(generateRib())
 						.beneficiaryType(BeneficiaryType.PHYSIQUE)
+						.transferList(transfers.stream().toList())
 						.build();
 				beneficiaryRepository.save(beneficiary);
 
 				System.out.println("**************************");
 				System.out.println("added "+beneficiary);
 			});
+
+
 		};
 	}
 
@@ -46,4 +56,6 @@ public class BeneficiaryServiceApplication {
 		}
 		return rib.toString();
 	}
+
+
 }
