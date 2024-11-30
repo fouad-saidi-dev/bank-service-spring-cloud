@@ -7,6 +7,8 @@ import com.fouadev.beneficiaryservice.mapper.BeneficiaryMapper;
 import com.fouadev.beneficiaryservice.model.Transfer;
 import com.fouadev.beneficiaryservice.repositories.BeneficiaryRepository;
 import com.fouadev.beneficiaryservice.services.BeneficiaryService;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.PagedModel;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@Log4j2
 public class BeneficiaryServiceImpl implements BeneficiaryService {
 
     @Autowired
@@ -74,12 +77,22 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     public List<BeneficiaryDTO> getAllBeneficiaries() {
          Collection<Transfer> transfers = transferRestClient.getAllTransfers().getContent();
 
+         transfers.forEach(transfer -> {
+             log.info("transfer : "+transfer.getBeneficiaryId());
+         });
+
         List<BeneficiaryDTO> beneficiaryDTOS = new ArrayList<>();
 
         List<Beneficiary> beneficiaryList = beneficiaryRepository.findAll();
 
         for (Beneficiary beneficiary : beneficiaryList) {
-            beneficiary.setTransferList(transfers);
+            List<Transfer> beneficiaryTransfers = transfers.stream()
+                    .filter(transfer -> transfer.getBeneficiaryId().equals(beneficiary.getId()))
+                    .toList();
+
+            log.info("beneficiaryTransfers : "+beneficiaryTransfers);
+
+            beneficiary.setTransferList(beneficiaryTransfers);
             BeneficiaryDTO beneficiaryDTO = beneficiaryMapper.fromBeneficiary(beneficiary);
             beneficiaryDTOS.add(beneficiaryDTO);
         }

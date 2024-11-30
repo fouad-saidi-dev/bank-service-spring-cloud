@@ -12,6 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -27,17 +28,29 @@ public class BeneficiaryServiceApplication {
 	CommandLineRunner init(BeneficiaryRepository beneficiaryRepository,
 						   TransferRestClient transferRestClient){
 		return args -> {
+
+
+
 			Collection<Transfer> transfers = transferRestClient.getAllTransfers().getContent();
+
+
 			Stream.of("fouad","reda","mohamed","imane","ahmed").forEach( name -> {
+
+				String beneficiaryId = UUID.randomUUID().toString();
+
+				List<Transfer> filteredTransfers = transfers.stream().filter(transfer -> transfer.getBeneficiaryId().equals(beneficiaryId)).toList();
+
 				Beneficiary beneficiary = Beneficiary.builder()
-						.id(UUID.randomUUID().toString())
+						.id(beneficiaryId)
 						.firstName(name)
 						.lastName(name+" last")
 						.rib(generateRib())
 						.beneficiaryType(BeneficiaryType.PHYSIQUE)
-						.transferList(transfers.stream().toList())
+						.transferList(filteredTransfers)
 						.build();
 				beneficiaryRepository.save(beneficiary);
+
+
 
 				System.out.println("**************************");
 				System.out.println("added "+beneficiary);
@@ -56,6 +69,5 @@ public class BeneficiaryServiceApplication {
 		}
 		return rib.toString();
 	}
-
 
 }

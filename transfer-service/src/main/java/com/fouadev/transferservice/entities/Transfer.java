@@ -1,6 +1,7 @@
 package com.fouadev.transferservice.entities;
 
 import com.fouadev.transferservice.enums.TransferType;
+import com.fouadev.transferservice.model.Beneficiary;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,8 @@ public class Transfer {
     private Date date;
     @Enumerated(value = EnumType.STRING)
     private TransferType type;
+    @Transient
+    private Beneficiary beneficiary;
 
 
 }

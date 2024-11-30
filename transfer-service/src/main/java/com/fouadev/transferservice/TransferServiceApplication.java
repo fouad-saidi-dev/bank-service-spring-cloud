@@ -29,6 +29,12 @@ public class TransferServiceApplication {
 			Collection<Beneficiary> beneficiaries = beneficiaryRestClient.findAll().getContent();
 
 			beneficiaries.forEach(beneficiary -> {
+
+				Beneficiary beneficiary1 = beneficiaryRestClient.findById(beneficiary.getId());;
+
+				System.out.println("**************************");
+				System.out.println(beneficiary1.getFirstName());
+
 				Transfer transfer = Transfer.builder()
 						.beneficiaryId(beneficiary.getId())
 						.type(TransferType.NORMAL)
@@ -36,6 +42,7 @@ public class TransferServiceApplication {
 						.sourceRib(beneficiary.getRib())
 						.date(new Date())
 						.description("normal transfer")
+						.beneficiary(beneficiary1)
 						.build();
 
 				transferRepository.save(transfer);
