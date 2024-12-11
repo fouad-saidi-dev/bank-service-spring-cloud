@@ -66,6 +66,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
 
         beneficiary.setFirstName(beneficiaryDTO.getFirstName());
         beneficiary.setLastName(beneficiaryDTO.getLastName());
+        beneficiary.setBeneficiaryType(beneficiaryDTO.getBeneficiaryType());
 
         Beneficiary savedBeneficiary = beneficiaryRepository.save(beneficiary);
         BeneficiaryDTO beneficiaryDTO1 = beneficiaryMapper.fromBeneficiary(savedBeneficiary);
